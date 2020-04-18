@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <external-path
+        name="files_path"
+        path="Android/data/cn.xinidi.sysplu_example/" />
+    <external-path
+        name="storage_path"
+        path="." />
+</paths>
