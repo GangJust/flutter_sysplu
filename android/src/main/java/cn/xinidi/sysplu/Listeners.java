@@ -18,13 +18,10 @@ public class Listeners {
         private MethodChannel.Result result;
         private Activity activity;
 
-        public PermissionListener(Activity activity, MethodChannel.Result result) {
-            this.activity = activity;
-            this.result = result;
-        }
-
         @Override
         public boolean onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+            if (result == null || activity == null) return false;
+
             Map<String, Integer> status = new HashMap<>();
             for (int i = 0; i < permissions.length; i++) {
                 boolean hasPermission = PermissionUtil.checkPermission(activity, permissions[i]);
@@ -37,7 +34,17 @@ public class Listeners {
                 status.put(permissions[i], grantResults[i]);
             }
             result.success(status);
+
             return true;
+        }
+
+
+        public void setResult(MethodChannel.Result result) {
+            this.result = result;
+        }
+
+        public void setActivity(Activity activity) {
+            this.activity = activity;
         }
     }
 }

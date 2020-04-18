@@ -13,6 +13,7 @@ import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
 
+import cn.xinidi.sysplu.Listeners;
 import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -33,8 +34,9 @@ public class PermissionUtil {
         for (String permission : permissions) {
             if (!checkPermission(activity, permission)) list.add(permission);
         }
-        if (!list.isEmpty())
+        if (!list.isEmpty()) {
             ActivityCompat.requestPermissions(activity, list.toArray(new String[list.size()]), P_CODE);
+        }
     }
 
     /**

@@ -1,14 +1,19 @@
 package cn.xinidi.sysplu;
 
+import android.app.Activity;
+import android.app.Application;
+
 import androidx.annotation.NonNull;
 
 import cn.xinidi.sysplu.handlers.AppInfoCallHandlerImpl;
 import cn.xinidi.sysplu.handlers.PermissionCallHandlerImpl;
 import cn.xinidi.sysplu.handlers.StorageCallHandlerImpl;
 import cn.xinidi.sysplu.handlers.SystemCallHandlerImpl;
+import io.flutter.Log;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
@@ -22,19 +27,79 @@ public class SyspluPlugin implements FlutterPlugin, ActivityAware {
     private static String PLU_STORAGE = "cn.xinidi/storage";
     private static String PLU_SYSTEM = "cn.xinidi/system";
 
-    //handler
-    private static PermissionCallHandlerImpl permissionCallHandler;
-    private static AppInfoCallHandlerImpl appInfoCallHandler;
-    private static StorageCallHandlerImpl storageCallHandler;
-    private static SystemCallHandlerImpl systemCallHandler;
+    //channel
+    private MethodChannel permissionChannel;
+    private MethodChannel appInfoChannel;
+    private MethodChannel storageChannel;
+    private MethodChannel systemChannel;
 
+    //handler
+    private PermissionCallHandlerImpl permissionCallHandler;
+    private AppInfoCallHandlerImpl appInfoCallHandler;
+    private StorageCallHandlerImpl storageCallHandler;
+    private SystemCallHandlerImpl systemCallHandler;
 
     @Override
-    public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        final MethodChannel permissionChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), PLU_PERMISSION);
-        final MethodChannel appInfoChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), PLU_APP_INFO);
-        final MethodChannel storageChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), PLU_STORAGE);
-        final MethodChannel systemChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), PLU_SYSTEM);
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        startListing(binding.getBinaryMessenger());
+        Log.d("GFlutter", "onAttachedToEngine");
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        Log.d("GFlutter", "onDetachedFromEngine");
+        stopListing();
+    }
+
+    @Override
+    public void onAttachedToActivity(ActivityPluginBinding binding) {
+        Log.d("GFlutter", "onAttachedToActivity");
+        //添加权限回调监听
+        Listeners.PermissionListener listener = new Listeners.PermissionListener();
+        binding.addRequestPermissionsResultListener(listener);
+
+        startListingToActivity(binding.getActivity().getApplication(), binding.getActivity(), listener);
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+        Log.d("GFlutter", "onReattachedToActivityForConfigChanges");
+        onAttachedToActivity(binding);
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+        Log.d("GFlutter", "onDetachedFromActivity");
+        stopListingToActivity();
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+        Log.d("GFlutter", "onDetachedFromActivityForConfigChanges");
+        onDetachedFromActivity();
+    }
+
+    public static void registerWith(Registrar registrar) {
+        SyspluPlugin syspluPlugin = new SyspluPlugin();
+        syspluPlugin.startListing(registrar.messenger());
+
+        Listeners.PermissionListener listener = new Listeners.PermissionListener();
+        registrar.addRequestPermissionsResultListener(listener);
+
+        if (registrar.activeContext() instanceof Activity) {
+            syspluPlugin.startListingToActivity(
+                    registrar.activity().getApplication(),
+                    registrar.activity(),
+                    listener
+            );
+        }
+    }
+
+    private void startListing(BinaryMessenger messenger) {
+        permissionChannel = new MethodChannel(messenger, PLU_PERMISSION);
+        appInfoChannel = new MethodChannel(messenger, PLU_APP_INFO);
+        storageChannel = new MethodChannel(messenger, PLU_STORAGE);
+        systemChannel = new MethodChannel(messenger, PLU_SYSTEM);
 
         permissionCallHandler = new PermissionCallHandlerImpl();
         appInfoCallHandler = new AppInfoCallHandlerImpl();
@@ -47,50 +112,49 @@ public class SyspluPlugin implements FlutterPlugin, ActivityAware {
         systemChannel.setMethodCallHandler(systemCallHandler);
     }
 
-    @Override
-    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+    private void stopListing() {
+        permissionChannel.setMethodCallHandler(null);
+        appInfoChannel.setMethodCallHandler(null);
+        storageChannel.setMethodCallHandler(null);
+        systemChannel.setMethodCallHandler(null);
 
+        permissionCallHandler = null;
+        appInfoCallHandler = null;
+        storageCallHandler = null;
+        systemCallHandler = null;
+
+        permissionChannel = null;
+        appInfoChannel = null;
+        storageChannel = null;
+        systemChannel = null;
     }
 
-    @Override
-    public void onAttachedToActivity(ActivityPluginBinding binding) {
+    private void startListingToActivity(Application application, Activity activity, Listeners.PermissionListener listener) {
         if (permissionCallHandler != null) {
-            permissionCallHandler.setApplication(binding.getActivity().getApplication());
-            permissionCallHandler.setActivity(binding.getActivity());
-            permissionCallHandler.setBinding(binding);
+            permissionCallHandler.setApplication(application);
+            permissionCallHandler.setActivity(activity);
+            permissionCallHandler.setPermissionListener(listener);
         }
 
         if (appInfoCallHandler != null) {
-            appInfoCallHandler.setApplication(binding.getActivity().getApplication());
-            appInfoCallHandler.setActivity(binding.getActivity());
+            appInfoCallHandler.setApplication(application);
+            appInfoCallHandler.setActivity(activity);
         }
         if (storageCallHandler != null) {
-            storageCallHandler.setApplication(binding.getActivity().getApplication());
-            storageCallHandler.setActivity(binding.getActivity());
+            storageCallHandler.setApplication(application);
+            storageCallHandler.setActivity(activity);
         }
 
         if (systemCallHandler != null) {
-            systemCallHandler.setApplication(binding.getActivity().getApplication());
-            systemCallHandler.setActivity(binding.getActivity());
+            systemCallHandler.setApplication(application);
+            systemCallHandler.setActivity(activity);
         }
     }
 
-    @Override
-    public void onDetachedFromActivityForConfigChanges() {
-
-    }
-
-    @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-        onAttachedToActivity(binding);
-    }
-
-    @Override
-    public void onDetachedFromActivity() {
+    private void stopListingToActivity() {
         if (permissionCallHandler != null) {
             permissionCallHandler.setApplication(null);
             permissionCallHandler.setActivity(null);
-            permissionCallHandler.setBinding(null);
         }
 
         if (appInfoCallHandler != null) {
@@ -107,12 +171,5 @@ public class SyspluPlugin implements FlutterPlugin, ActivityAware {
             systemCallHandler.setApplication(null);
             systemCallHandler.setActivity(null);
         }
-    }
-
-
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel permissionChannel = new MethodChannel(registrar.messenger(), PLU_PERMISSION);
-        permissionCallHandler = new PermissionCallHandlerImpl();
-        permissionChannel.setMethodCallHandler(permissionCallHandler);
     }
 }

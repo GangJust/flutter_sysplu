@@ -17,6 +17,7 @@ class _AndroidPermissionGroup {
   final String SMS = "android.permission-group.SMS";
   final String STORAGE = "android.permission-group.STORAGE";
 }
+
 ///常量
 class _AndroidPermission {
   _AndroidPermission._();
@@ -258,7 +259,8 @@ class PermissionUtil {
 }
 
 class _AndroidPermissionUtil {
-  static const MethodChannel _channel = const MethodChannel('cn.xinidi/permission');
+  static const MethodChannel _channel = const MethodChannel(
+      'cn.xinidi/permission');
 
   _AndroidPermissionGroup permissionGroup = _AndroidPermissionGroup._();
   _AndroidPermission permission = _AndroidPermission._();

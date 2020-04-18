@@ -17,11 +17,11 @@ import io.flutter.plugin.common.MethodChannel;
 public class PermissionCallHandlerImpl implements BaseCallHandler {
     private Application application;
     private Activity activity;
-    private ActivityPluginBinding binding;
+    private Listeners.PermissionListener permissionListener;
 
     @Override
     public void onMethodCall(MethodCall call, MethodChannel.Result result) {
-        if (activity == null || application == null || binding == null) {
+        if (activity == null || application == null) {
             result.error("-1", "Failed to attach to Activity!", null);
             return;
         }
@@ -35,7 +35,9 @@ public class PermissionCallHandlerImpl implements BaseCallHandler {
             ArrayList<String> list = call.arguments();
             String[] permission = list.toArray(new String[list.size()]);
             PermissionUtil.requestPermission(activity, permission);
-            binding.addRequestPermissionsResultListener(new Listeners.PermissionListener(activity, result));
+            //设置activity和消息回调
+            permissionListener.setActivity(activity);
+            permissionListener.setResult(result);
             return;
         }
 
@@ -53,8 +55,7 @@ public class PermissionCallHandlerImpl implements BaseCallHandler {
         this.activity = activity;
     }
 
-    public void setBinding(ActivityPluginBinding binding) {
-        this.binding = binding;
+    public void setPermissionListener(Listeners.PermissionListener permissionListener) {
+        this.permissionListener = permissionListener;
     }
-
 }

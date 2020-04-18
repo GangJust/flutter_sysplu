@@ -57,7 +57,7 @@ public class SystemCallHandlerImpl implements BaseCallHandler {
         }
 
         if (call.method.equals("startTypeFile")) {
-            String filePath = new StringBuffer().append(call.arguments()).toString();
+            String filePath = new StringBuffer().append(call.arguments).toString();
             if (filePath != null) {
                 result.success(SystemUtil.startTypeFile(activity, filePath));
             }
