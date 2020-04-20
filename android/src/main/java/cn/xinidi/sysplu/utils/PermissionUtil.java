@@ -12,6 +12,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import cn.xinidi.sysplu.Listeners;
 import io.flutter.Log;
@@ -27,15 +29,24 @@ public class PermissionUtil {
      * @param activity
      * @param permissions
      */
-    public static void requestPermission(Activity activity, String[] permissions) {
+    public static void requestPermission(Activity activity, String[] permissions, MethodChannel.Result result) {
         if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.M) return;
 
         ArrayList<String> list = new ArrayList<>();
         for (String permission : permissions) {
-            if (!checkPermission(activity, permission)) list.add(permission);
+            if (!checkPermission(activity, permission)) {
+                list.add(permission);
+            }
         }
         if (!list.isEmpty()) {
             ActivityCompat.requestPermissions(activity, list.toArray(new String[list.size()]), P_CODE);
+        } else {
+            ///否则发送消息
+            Map<String, Integer> status = new HashMap<>();
+            for (String permission : permissions) {
+                status.put(permission, 0);
+            }
+            result.success(status);
         }
     }
 

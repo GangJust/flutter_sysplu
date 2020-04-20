@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Application;
 
 import cn.xinidi.sysplu.utils.StorageUtil;
+import io.flutter.Log;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 

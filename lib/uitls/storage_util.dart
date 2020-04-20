@@ -9,7 +9,7 @@ class StorageUtil {
 
   static _StorageUtil getAndroidInstance() {
     if (Platform.isAndroid) {
-      if (_StorageUtil == null) _storageUtil = _StorageUtil();
+      if (_storageUtil == null) _storageUtil = _StorageUtil();
       return _storageUtil;
     }
     return null;

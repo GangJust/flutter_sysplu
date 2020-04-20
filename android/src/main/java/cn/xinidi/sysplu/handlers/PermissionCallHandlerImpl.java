@@ -34,11 +34,11 @@ public class PermissionCallHandlerImpl implements BaseCallHandler {
         if (call.method.equals("requestPermission")) {
             ArrayList<String> list = call.arguments();
             String[] permission = list.toArray(new String[list.size()]);
-            PermissionUtil.requestPermission(activity, permission);
             //设置activity和消息回调
             permissionListener.setActivity(activity);
             permissionListener.setResult(result);
-            return;
+
+            PermissionUtil.requestPermission(activity, permission, result);
         }
 
         if (call.method.equals("toSelfSetting")) {
