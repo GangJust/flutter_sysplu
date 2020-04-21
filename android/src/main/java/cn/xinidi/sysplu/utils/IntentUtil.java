@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
@@ -32,6 +33,7 @@ public class IntentUtil {
      */
     public static Intent getIntent(Context context, String path) {
         String suffix = FileUtil.getSuffix(path);
+
         if (suffix == null) return null;
 
         switch (suffix) {
@@ -39,9 +41,26 @@ public class IntentUtil {
             case "apk":
                 return _getIntent(context, path, APP_TYPE);
             //文本文件
+            case "asp":
+            case "bat":
+            case "c":
+            case "cpp":
+            case "cmd":
+            case "dart":
+            case "java":
+            case "js":
+            case "jsp":
+            case "json":
+            case "htm":
+            case "html":
+            case "kt":
+            case "php":
+            case "smali":
+            case "vbs":
+            case "xhtml":
+            case "xml":
             case "text":
             case "txt":
-            case "html":
                 return _getIntent(context, path, TEXT_TYPE);
             //压缩文件
             case "gz":

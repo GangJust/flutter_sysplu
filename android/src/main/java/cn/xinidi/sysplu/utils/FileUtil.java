@@ -18,14 +18,14 @@ public class FileUtil {
      */
     public static String getSuffix(String path) {
 
-        //Log.d("GT", "path:" + path);
+        //Log.d("GF", "path:" + path);
 
         //如果文件不存在或者是文件夹
         File file = (new File(path));
         if (!file.exists() || file.isDirectory()) return null;
         String suffix = path.substring(path.lastIndexOf(".") + 1);
-        /*Log.d("GT", "path.length:" + path.length());
-        Log.d("GT", "suffix:" + suffix);*/
+        /*Log.d("GF", "path.length:" + path.length());
+        Log.d("GF", "suffix:" + suffix);*/
 
         return suffix.toLowerCase();
     }

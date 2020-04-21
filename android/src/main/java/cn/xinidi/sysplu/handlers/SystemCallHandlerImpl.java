@@ -3,6 +3,7 @@ package cn.xinidi.sysplu.handlers;
 import android.app.Activity;
 import android.app.Application;
 import android.os.Build;
+import android.util.Log;
 
 import cn.xinidi.sysplu.utils.SystemUtil;
 import io.flutter.plugin.common.MethodCall;
@@ -57,7 +58,9 @@ public class SystemCallHandlerImpl implements BaseCallHandler {
         }
 
         if (call.method.equals("startTypeFile")) {
+
             String filePath = new StringBuffer().append(call.arguments).toString();
+
             if (filePath != null) {
                 result.success(SystemUtil.startTypeFile(activity, filePath));
             }
