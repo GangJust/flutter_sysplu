@@ -30,7 +30,7 @@ class _SystemUtil {
 
   ///是否具有安装未知应用的权限，AndroidO上才有判断
   Future<bool> hasInstallPermissionWithO() async {
-    return await _channel.invokeMethod('hasInstallPermissionWithO');
+    return await _channel.invokeMethod('isHasInstallPermissionWithO');
   }
 
   ///跳转设置安装未知来源应用权限界面

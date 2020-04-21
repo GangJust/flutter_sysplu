@@ -24,8 +24,8 @@ public class FileUtil {
         File file = (new File(path));
         if (!file.exists() || file.isDirectory()) return null;
         String suffix = path.substring(path.lastIndexOf(".") + 1);
-        Log.d("GT", "path.length:" + path.length());
-        Log.d("GT", "suffix:" + suffix);
+        /*Log.d("GT", "path.length:" + path.length());
+        Log.d("GT", "suffix:" + suffix);*/
 
         return suffix.toLowerCase();
     }
